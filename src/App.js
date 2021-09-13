@@ -1,30 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={ logo } className="App-logo" alt="logo" />
-        <p>
-          Edit
-          <code>
-            src/App.js
-          </code>
-          and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      api: undefined,
+      loading: true,
+    }
+  }
+
+  fetchDog = async () => {
+    this.setState({
+      loading: true,
+    }, async () => {
+      const responseRaw = await fetch('https://dog.ceo/api/breeds/image/random');
+      const responseJson = await responseRaw.json();
+      this.setState({
+        loading: false,
+        api: responseJson,
+      })
+    })
+  }
+
+  handleClick = () => {
+    this.fetchDog();
+  }
+
+  componentDidMount() {
+    this.fetchDog();
+  }
+
+  render() {
+    const { api, loading } = this.state;
+    const loadingMessage = <span>Loading...</span>;
+    return (
+      <>
+        <div>
+          <h1>Doguinho aleatório <span role="img" aria-label="dog">🐶</span></h1>
+          { loading ? loadingMessage : <img src={ api.message } alt="Cachorro Aleatório" /> }
+        </div>
+        <div className="button-container">
+          <button onClick={ this.handleClick }>Clique para mais Doguinhos!</button>
+        </div>
+      </>
+    )
+  }
 }
 
 export default App;
