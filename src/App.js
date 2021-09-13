@@ -6,9 +6,15 @@ class App extends React.Component {
     super();
 
     this.state = {
-      api: undefined,
+      message: '',
+      breed: '',
       loading: true,
     }
+  }
+
+  shouldComponentUpdate(_nextProps, nextState) {
+    const { message } = nextState;
+    return !message.includes('terrier');
   }
 
   fetchDog = async () => {
@@ -19,30 +25,33 @@ class App extends React.Component {
       const responseJson = await responseRaw.json();
       this.setState({
         loading: false,
-        api: responseJson,
+        message: responseJson.message,
+        breed: responseJson.message.split('/')[4],
       })
     })
-  }
-
-  handleClick = () => {
-    this.fetchDog();
   }
 
   componentDidMount() {
     this.fetchDog();
   }
 
+  componentDidUpdate(_nextProps, nextState) {
+    const { message } = this.state;
+    localStorage.setItem('imgUrl', message);
+    alert(nextState.breed);
+  }
+
   render() {
-    const { api, loading } = this.state;
+    const { message, loading } = this.state;
     const loadingMessage = <span>Loading...</span>;
     return (
       <>
         <div>
           <h1>Doguinho aleatório <span role="img" aria-label="dog">🐶</span></h1>
-          { loading ? loadingMessage : <img src={ api.message } alt="Cachorro Aleatório" /> }
+          { loading ? loadingMessage : <img src={ message } alt="Cachorro Aleatório" /> }
         </div>
         <div className="button-container">
-          <button onClick={ this.handleClick }>Clique para mais Doguinhos!</button>
+          <button onClick={ this.fetchDog }>Clique para mais Doguinhos!</button>
         </div>
       </>
     )
